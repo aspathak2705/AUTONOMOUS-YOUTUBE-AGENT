@@ -2,25 +2,19 @@
 
 ## 1. Prerequisites
 
-Verify installed tools on your local system:
-- **Python**: 3.10, 3.11, or 3.12 (Detected: Python 3.10.11)
-- **Git**: 2.x+ (Detected: 2.54.0.windows.1)
-- **Node.js & npm**: Node 18+ and npm 9+ (Required for frontend development)
-- **Docker**: Optional for containerized backend execution
+- **Python**: 3.10+ (Verified on Python 3.10.11)
+- **Node.js**: 18+ LTS and npm 9+ (Required for frontend development)
+- **Git**: 2.x+
+- **Docker**: *Explicitly NOT required.*
 
 ---
 
-## 2. Environment Audit
+## 2. Environment Verification
 
-Run the built-in diagnostic script from project root:
+Run the built-in diagnostic script:
 ```powershell
 python scripts/check_environment.py
 ```
-This script audits:
-- Installed toolchain versions
-- Configuration file availability
-- Missing environment variables
-- Local media storage write access
 
 ---
 
@@ -43,104 +37,100 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-### 3.2 Configure Backend Environment
-Copy the example configuration to `.env` in the repository root:
+### 3.2 Configure Environment
 ```powershell
+# In project root
 cp .env.example .env
 ```
-Key configuration items:
-- `DATABASE_URL`: Your Supabase connection string.
-- `OPENROUTER_API_KEY`: Free key from [OpenRouter](https://openrouter.ai).
-- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: OAuth credentials from Google Cloud Console.
 
-### 3.3 Starting the Backend
-```powershell
-# In backend directory (with virtual environment active):
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
-Verify endpoints in browser or curl:
-- Root: `http://127.0.0.1:8000/`
-- Process Liveness: `http://127.0.0.1:8000/api/v1/health/live`
-- Readiness & DB Status: `http://127.0.0.1:8000/api/v1/health/ready`
-- Dependencies Report: `http://127.0.0.1:8000/api/v1/health/dependencies`
-
----
-
-## 4. Supabase Database Configuration & Migrations
-
-### 4.1 Connection Settings
-Supabase offers two connection methods:
-1. **Direct Connection (Port 5432)**:
-   ```env
-   DATABASE_URL=postgresql+psycopg://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres?sslmode=require
-   ```
-   *Note: Direct connection requires IPv6 support.*
-2. **Session Pooler (Port 6543)**:
-   ```env
-   DATABASE_URL=postgresql+psycopg://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres?sslmode=require
-   ```
-   *Recommended for IPv4-only networks and local development.*
-
-### 4.2 Test Database Connection
-```powershell
-python scripts/check_supabase_connection.py
-```
-
-### 4.3 Database Migrations (Alembic)
-Run migrations to update database schema:
+### 3.3 Run Database Migrations (Alembic)
+Apply migrations to configured Supabase database:
 ```powershell
 cd backend
 alembic upgrade head
 ```
-Create a new migration after model changes:
+
+Verify migration SQL offline:
 ```powershell
-alembic revision --autogenerate -m "describe_changes"
+cd backend
+alembic upgrade head --sql
+```
+
+### 3.4 Start FastAPI Server
+```powershell
+cd backend
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+Endpoints:
+- Liveness: `http://127.0.0.1:8000/api/v1/health/live`
+- Readiness: `http://127.0.0.1:8000/api/v1/health/ready`
+- Dependencies: `http://127.0.0.1:8000/api/v1/health/dependencies`
+- Creator Profile: `http://127.0.0.1:8000/api/v1/profile`
+- Topic Schedules: `http://127.0.0.1:8000/api/v1/profile/schedules`
+
+---
+
+## 4. Supabase PostgreSQL Connection Strategy
+
+Supabase offers two connection methods:
+1. **Shared Session Pooler (Port 5432)**:
+   ```env
+   DATABASE_URL=postgresql+psycopg://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres?sslmode=require
+   ```
+   *Session mode operates on port 5432.*
+2. **Shared Transaction Pooler (Port 6543)**:
+   ```env
+   DATABASE_URL=postgresql+psycopg://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?sslmode=require
+   ```
+   *Transaction mode operates on port 6543.*
+3. **Direct Connection (Port 5432)**:
+   ```env
+   DATABASE_URL=postgresql+psycopg://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres?sslmode=require
+   ```
+   *Requires IPv6 network support.*
+
+Test connectivity via script:
+```powershell
+python scripts/check_supabase_connection.py
 ```
 
 ---
 
 ## 5. Frontend Setup
 
-### 5.1 Installation & Startup
+### 5.1 Node.js Installation
+If Node.js is not installed:
+- Download Node.js LTS (v20.x recommended) from [nodejs.org](https://nodejs.org).
+- Verify in terminal: `node --version; npm --version`
+
+### 5.2 Install Dependencies & Start Dev Server
 ```powershell
 cd frontend
 cp .env.example .env
 npm install
 npm run dev
 ```
-The dashboard starts at `http://localhost:5173`. It connects to backend health endpoints at `http://localhost:8000`.
+Dashboard available at `http://localhost:5173`.
 
 ---
 
-## 6. Running Tests & Quality Checks
+## 6. Running Tests & Code Quality
 
 ### 6.1 Backend Tests
 ```powershell
-# From project root:
 $env:PYTHONPATH = "backend"
 python -m pytest backend/tests -v
 ```
 
-### 6.2 Syntax Verification
+### 6.2 Python Bytecode Compilation
 ```powershell
-python -m py_compile backend/app/main.py backend/app/core/config.py backend/app/db/session.py
+python -m py_compile backend/app/main.py backend/app/core/config.py backend/app/db/session.py backend/app/models/entities.py backend/app/schemas/profile.py
 ```
 
-### 6.3 Frontend Tests (Once Node.js is installed)
+### 6.3 Frontend Checks (Once Node.js installed)
 ```powershell
 cd frontend
 npm test
 npm run lint
+npm run build
 ```
-
----
-
-## 7. Troubleshooting Common Issues
-
-1. **`OperationalError` on Database Check**:
-   - Check if you are on an IPv4 network. Use port `6543` (Supabase Session Pooler) instead of `5432`.
-   - Verify `sslmode=require` is present in query parameters.
-2. **CORS Error in Browser**:
-   - Verify `FRONTEND_ORIGIN` in `.env` matches your browser URL (default: `http://localhost:5173`).
-3. **ModuleNotFoundError: No module named 'app'**:
-   - Set `PYTHONPATH=backend` or install backend in editable mode via `pip install -e .`.

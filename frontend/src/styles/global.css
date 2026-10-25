@@ -1,0 +1,63 @@
+/* Retro YouTube Studio Global Styles */
+@import './tokens.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-space);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* CRT / Starfield pattern overlay */
+body {
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(112, 71, 194, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(32, 184, 176, 0.15) 0%, transparent 40%),
+    linear-gradient(rgba(27, 21, 68, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 21, 68, 0.4) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+  min-height: 100vh;
+}
+
+/* Accessible focus styling */
+:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+a {
+  color: var(--accent-teal);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Typography elements */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}

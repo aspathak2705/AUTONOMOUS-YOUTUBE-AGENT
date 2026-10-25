@@ -1,0 +1,52 @@
+/* Retro YouTube Studio Design System — CSS Tokens */
+
+:root {
+  /* Canvas & Night Sky Backgrounds */
+  --bg-space: #100d2d;
+  --bg-deep-indigo: #1b1544;
+  --bg-panel-purple: #34206b;
+  --bg-panel-dark: #231649;
+
+  /* Retro Studio Accents */
+  --accent-orange: #ff792f;
+  --accent-orange-hover: #ff8e4d;
+  --accent-teal: #20b8b0;
+  --accent-teal-hover: #2cd5cc;
+  --accent-purple-glow: #7047c2;
+  --accent-gold: #ffbe3b;
+
+  /* Cream & Warm Studio Papers */
+  --card-cream: #f7e8c5;
+  --card-cream-dark: #e9d7ae;
+  --card-cream-light: #fff5db;
+  --text-dark: #1e1338;
+  --text-dark-muted: #4e3f6b;
+
+  /* Text & Labels */
+  --text-primary: #fff8e8;
+  --text-secondary: #a99bcf;
+  --text-muted: #796c9e;
+
+  /* Status Colors */
+  --status-success: #58b98a;
+  --status-success-bg: rgba(88, 185, 138, 0.15);
+  --status-warning: #ffbe3b;
+  --status-warning-bg: rgba(255, 190, 59, 0.15);
+  --status-error: #e45454;
+  --status-error-bg: rgba(228, 84, 84, 0.15);
+  --status-info: #20b8b0;
+  --status-info-bg: rgba(32, 184, 176, 0.15);
+
+  /* Borders & Inset Shadows */
+  --border-dark: #120b29;
+  --border-purple: #4c328f;
+  --border-cream: #d3c095;
+  --retro-shadow: 4px 4px 0px #120b29;
+  --retro-shadow-sm: 2px 2px 0px #120b29;
+  --retro-shadow-cream: 3px 3px 0px #ab9870;
+
+  /* Typography Stacks */
+  --font-display: "Courier New", Courier, monospace, system-ui;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}

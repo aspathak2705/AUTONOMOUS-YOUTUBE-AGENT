@@ -16,13 +16,23 @@ These non-negotiable guidelines govern all development on `autonomous-youtube-ag
 - **One LLM Request per Content Package**: Daily content generation (long-form script, Shorts script, titles, descriptions, hashtags, thumbnail prompts, narration) must be requested in a single structured LLM call.
 - **Human-Generated Video**: The user manually creates videos using external tools. Never configure paid video generation APIs.
 
-## 3. Security & Credentials
+## 3. Workflow & Containerization Strategy
+- **No Docker Requirement**: Docker is explicitly removed from development workflow. Run backend directly through Python venv and frontend via Node.js/npm. Never make Docker or local PostgreSQL containerization mandatory.
+- **Direct Execution**: Support direct local execution and remote Supabase PostgreSQL connectivity.
+
+## 4. Frontend Visual Identity & Design System
+- **Retro YouTube Studio Design System**: The entire application frontend must follow the retro studio design system inspired by 1990s/early-2000s web interfaces.
+- **Design Tokens**: All styling must use central theme CSS variables (`--bg-space`, `--card-cream`, `--accent-orange`, `--accent-teal`, `--border-purple`, etc.).
+- **No Generic Templates**: Never introduce generic SaaS admin dashboard templates or unstyled wireframes.
+- **Honest UI**: Never fabricate or hardcode successful production metrics or fake published items.
+
+## 5. Security & Credentials
 - **No Secrets in Code**: Never commit API keys, Google client secrets, database passwords, refresh tokens, or Fernet encryption keys.
 - **Frontend Isolation**: Never expose backend secrets, database URLs, or OAuth secrets via browser-safe environment variables (`VITE_`).
 - **No Secrets in Logs or Output**: Sanitize log records, diagnostic outputs, and API error responses. Scrub credentials, access tokens, and raw connection URIs.
 - **Safe SQL**: Always use SQLAlchemy parameter binding and Alembic migrations. Never execute arbitrary or destructive SQL queries automatically.
 
-## 4. Code Quality & Type Safety
+## 6. Code Quality & Type Safety
 - **Strict Typing**:
   - Python: Use complete type hints (`pydantic` models for schemas, typing primitives for function signatures).
   - TypeScript: Strict mode (`noImplicitAny`, `noUnusedLocals`, `strictNullChecks`).

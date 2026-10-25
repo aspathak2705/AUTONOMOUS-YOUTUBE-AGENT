@@ -6,7 +6,18 @@ An AI-assisted YouTube content production and publishing system designed for sol
 
 ## Overview
 
-The Autonomous YouTube Agent automates niche topic research, structured video & Shorts packaging, publishing asset validation, and scheduled publication via the YouTube Data API v3, operating under a zero-cost API infrastructure budget.
+The Autonomous YouTube Agent automates niche topic research, structured video & Shorts packaging, publishing asset validation, and scheduled publication via the YouTube Data API v3, operating under a zero-cost API infrastructure budget with a retro-inspired creator workspace.
+
+---
+
+## Technology Stack
+
+- **Backend**: Python 3.10+, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic V2, Psycopg 3.
+- **Frontend**: React 18, TypeScript (Strict Mode), Vite, Retro Studio Design System (CSS Tokens).
+- **Database**: Supabase PostgreSQL (Managed, connection pooling supported).
+- **LLM Gateway**: OpenRouter Free Tier (`openrouter/free`, `meta-llama/llama-3.3-70b-instruct:free`).
+- **YouTube**: YouTube Data API v3, Google OAuth 2.0 (Testing Mode).
+- **Execution**: Direct native execution (Docker explicitly excluded from workflow).
 
 ---
 
@@ -14,12 +25,23 @@ The Autonomous YouTube Agent automates niche topic research, structured video & 
 
 ```
 autonomous-youtube-agent/
-├── frontend/             # React + TypeScript + Vite UI
+├── frontend/             # React + TypeScript + Vite UI with Retro Studio theme
+│   ├── src/
+│   │   ├── components/   # AppShell, RetroWindow, PixelButton, StatusBadge
+│   │   ├── pages/        # Dashboard
+│   │   ├── services/     # Typed API clients (healthApi, profileApi)
+│   │   ├── styles/       # tokens.css, global.css
+│   │   └── types/        # api.ts
 ├── backend/              # FastAPI + SQLAlchemy + Pydantic backend
-│   ├── app/              # Application source (core, db, schemas, api, services)
-│   ├── migrations/       # Alembic database migrations
-│   └── tests/            # Automated test suite
-├── deployment/           # Dockerfile & compose definitions
+│   ├── app/
+│   │   ├── api/routes/   # health, profile
+│   │   ├── core/         # config, logging
+│   │   ├── db/           # base, session, repositories
+│   │   ├── models/       # entities (CreatorProfile, WeeklyTopicSchedule, etc.)
+│   │   ├── schemas/      # health, profile
+│   │   └── services/     # profile_service
+│   ├── migrations/       # Alembic migrations (001_initial_phase1_schema)
+│   └── tests/            # pytest suite (models, services, APIs, health)
 ├── docs/                 # Architecture, Feasibility, Development & Deployment guides
 ├── scripts/              # Environment & connectivity diagnostics
 ├── AGENTS.md             # Engineering conventions and rules
@@ -31,19 +53,13 @@ autonomous-youtube-agent/
 
 ## Quickstart (Local Development)
 
-### 1. Prerequisites
-- Python 3.10+ (Python 3.12 recommended)
-- Node.js 18+ and npm (for frontend)
-- Git
-
-### 2. Backend Setup
+### 1. Backend Setup
 ```bash
-# In project root:
 cd backend
 python -m venv .venv
 # On Windows PowerShell:
 .venv\Scripts\Activate.ps1
-# On Unix:
+# On Unix / macOS:
 source .venv/bin/activate
 
 pip install -e ".[dev]"
@@ -51,36 +67,51 @@ pip install -e ".[dev]"
 
 Configure your environment:
 ```bash
-# In project root
-cp .env.example .env
+cp ../.env.example .env
 ```
 
-Start the backend:
+Start the FastAPI backend:
 ```bash
-# From backend directory
 uvicorn app.main:app --reload --port 8000
 ```
-API will be live at `http://localhost:8000`. Liveness endpoint: `http://localhost:8000/api/v1/health/live`.
+- API Base: `http://localhost:8000`
+- Interactive OpenAPI Docs: `http://localhost:8000/docs` (when `APP_DEBUG=true`)
 
-### 3. Frontend Setup
+### 2. Frontend Setup
 ```bash
 cd frontend
 cp .env.example .env
 npm install
 npm run dev
 ```
-Dashboard will be live at `http://localhost:5173`.
+Dashboard will be available at `http://localhost:5173`.
 
 ---
 
-## Running Verification Scripts
+## Database Migrations (Alembic)
+
+To apply migrations against your configured Supabase PostgreSQL database:
+```bash
+cd backend
+alembic upgrade head
+```
+
+To generate static migration SQL without an active database:
+```bash
+cd backend
+alembic upgrade head --sql
+```
+
+---
+
+## Running Verification & Tests
 
 Run the safe environment audit:
 ```bash
 python scripts/check_environment.py
 ```
 
-Test your Supabase PostgreSQL connection:
+Test your Supabase connection:
 ```bash
 python scripts/check_supabase_connection.py
 ```
@@ -95,8 +126,8 @@ python -m pytest backend/tests -v
 
 ## Documentation
 
-Detailed documentation is available in the [`docs/`](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs) directory:
+Detailed documentation is available in [`docs/`](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs):
 - [Architecture Blueprint](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs/architecture.md)
-- [Feasibility Audit & Findings](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs/feasibility-report.md)
+- [Feasibility Report](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs/feasibility-report.md)
 - [Development Guide](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs/development.md)
 - [Deployment Guide](file:///c:/Users/athar/OneDrive/Documents/projects/Youtube-Autonomous-Agent/docs/deployment.md)
