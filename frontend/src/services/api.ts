@@ -32,15 +32,26 @@ export interface WeeklyTopicSchedule {
   updated_at: string;
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
+async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
     headers: {
       'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...(options?.headers || {}),
     },
   });
 
   if (!response.ok && response.status !== 503) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    let detail = `Error ${response.status}: ${response.statusText}`;
+    try {
+      const body = await response.json();
+      if (body.detail) detail = body.detail;
+      else if (body.message) detail = body.message;
+    } catch {
+      // Keep default
+    }
+    throw new Error(detail);
   }
 
   return response.json() as Promise<T>;
@@ -54,6 +65,24 @@ export const healthApi = {
 };
 
 export const profileApi = {
-  getProfile: (): Promise<CreatorProfile> => fetchJson<CreatorProfile>('/api/v1/profile'),
+  getProfile: (): Promise<CreatorProfile | null> => fetchJson<CreatorProfile | null>('/api/v1/profile'),
+  updateProfile: (data: Partial<CreatorProfile>): Promise<CreatorProfile> =>
+    fetchJson<CreatorProfile>('/api/v1/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
   listSchedules: (): Promise<WeeklyTopicSchedule[]> => fetchJson<WeeklyTopicSchedule[]>('/api/v1/profile/schedules'),
+  upsertSchedule: (data: { day_of_week: string; topic: string; subtopic?: string; content_focus?: string }): Promise<WeeklyTopicSchedule> =>
+    fetchJson<WeeklyTopicSchedule>('/api/v1/profile/schedules', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  deleteSchedule: async (id: string): Promise<void> => {
+    const res = await fetch(`${API_BASE_URL}/api/v1/profile/schedules/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok && res.status !== 204) {
+      throw new Error(`Failed to delete topic schedule (${res.status})`);
+    }
+  },
 };

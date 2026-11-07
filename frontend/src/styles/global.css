@@ -1,4 +1,5 @@
-/* Retro YouTube Studio Global Styles */
+/* Indian Vintage Illustrated Poster Global Styles & Reset */
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Space+Mono:wght@400;700&display=swap');
 @import './tokens.css';
 
 *, *::before, *::after {
@@ -8,56 +9,78 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-space);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-on-dark);
+  font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* CRT / Starfield pattern overlay */
+/* Vintage Indian Print Lithograph Pattern Background */
 body {
+  background-color: var(--ornamental-indigo);
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(112, 71, 194, 0.25) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(32, 184, 176, 0.15) 0%, transparent 40%),
-    linear-gradient(rgba(27, 21, 68, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(27, 21, 68, 0.4) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+    radial-gradient(circle at 10% 10%, rgba(244, 169, 40, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(7, 141, 173, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(213, 42, 128, 0.08) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(36, 21, 44, 0.4) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(36, 21, 44, 0.4) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(36, 21, 44, 0.4) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(36, 21, 44, 0.4) 25%, transparent 25%);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px, 32px 32px, 32px 32px;
   min-height: 100vh;
 }
 
-/* Accessible focus styling */
 :focus-visible {
-  outline: 2px solid var(--accent-orange);
+  outline: 3px solid var(--saffron-bright);
   outline-offset: 2px;
 }
 
 button {
   font-family: inherit;
   font-size: inherit;
+  cursor: pointer;
 }
 
 a {
-  color: var(--accent-teal);
+  color: var(--rich-turquoise);
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
+  color: var(--saffron-bright);
 }
 
-/* Typography elements */
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.font-display {
+  font-family: var(--font-display);
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
-.font-display {
-  font-family: var(--font-display);
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ink-navy);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--saffron-gold);
+  border: 2px solid var(--dark-outline);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vermilion);
 }

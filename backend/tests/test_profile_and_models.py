@@ -111,7 +111,16 @@ def test_profile_api_endpoints(in_memory_db):
 
     from app.api.routes.profile import get_creator_profile, list_topic_schedules, upsert_topic_schedule
     
+    # 1. Before creation, profile is None
+    res_none = get_creator_profile(service=service)
+    assert res_none is None
+
+    # 2. When updated, profile is created and returned
+    created = service.update_profile(CreatorProfileUpdate(display_name="Solo Creator"))
+    assert created.display_name == "Solo Creator"
+
     res = get_creator_profile(service=service)
+    assert res is not None
     assert res.display_name == "Solo Creator"
 
     created_sched = upsert_topic_schedule(

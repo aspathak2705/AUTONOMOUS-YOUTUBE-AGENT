@@ -1,52 +1,53 @@
-/* Retro YouTube Studio Design System — CSS Tokens */
+/* Indian Vintage Illustrated Poster × YouTube Creator Studio — Design Tokens */
 
 :root {
-  /* Canvas & Night Sky Backgrounds */
-  --bg-space: #100d2d;
-  --bg-deep-indigo: #1b1544;
-  --bg-panel-purple: #34206b;
-  --bg-panel-dark: #231649;
+  /* Primary Indian Vintage Poster Palette */
+  --ink-navy: #111a32;
+  --ornamental-indigo: #17102f;
+  --deep-maroon: #250d18;
+  --rich-turquoise: #078dad;
+  --festival-teal: #12a8a5;
+  --saffron-gold: #f4a928;
+  --saffron-bright: #ffbe33;
+  --vermilion: #d93b32;
+  --vermilion-glow: #e64a41;
+  --festive-magenta: #d52a80;
+  --warm-cream: #f4deb6;
+  --antique-paper: #e9cfa2;
+  --parchment-light: #fdf6e7;
+  --dark-outline: #24152c;
+  --soft-pink: #e98c9e;
 
-  /* Retro Studio Accents */
-  --accent-orange: #ff792f;
-  --accent-orange-hover: #ff8e4d;
-  --accent-teal: #20b8b0;
-  --accent-teal-hover: #2cd5cc;
-  --accent-purple-glow: #7047c2;
-  --accent-gold: #ffbe3b;
+  /* Semantic UI Tokens */
+  --bg-canvas: #0e0a1e;
+  --surface-primary: #17102f;
+  --surface-card: #f4deb6;
+  --surface-card-alt: #e9cfa2;
+  --surface-dark-card: #181d36;
+  
+  --text-on-dark: #fdf6e7;
+  --text-on-dark-muted: #cbb998;
+  --text-on-cream: #24152c;
+  --text-on-cream-muted: #5e4733;
 
-  /* Cream & Warm Studio Papers */
-  --card-cream: #f7e8c5;
-  --card-cream-dark: #e9d7ae;
-  --card-cream-light: #fff5db;
-  --text-dark: #1e1338;
-  --text-dark-muted: #4e3f6b;
+  --accent-primary: #f4a928; /* Saffron gold */
+  --accent-secondary: #078dad; /* Rich turquoise */
+  --accent-danger: #d93b32; /* Vermilion */
+  --accent-vibrant: #d52a80; /* Festive Magenta */
 
-  /* Text & Labels */
-  --text-primary: #fff8e8;
-  --text-secondary: #a99bcf;
-  --text-muted: #796c9e;
+  --border-ornate-gold: #f4a928;
+  --border-dark: #24152c;
+  --border-cream: #d3b37f;
 
-  /* Status Colors */
-  --status-success: #58b98a;
-  --status-success-bg: rgba(88, 185, 138, 0.15);
-  --status-warning: #ffbe3b;
-  --status-warning-bg: rgba(255, 190, 59, 0.15);
-  --status-error: #e45454;
-  --status-error-bg: rgba(228, 84, 84, 0.15);
-  --status-info: #20b8b0;
-  --status-info-bg: rgba(32, 184, 176, 0.15);
-
-  /* Borders & Inset Shadows */
-  --border-dark: #120b29;
-  --border-purple: #4c328f;
-  --border-cream: #d3c095;
-  --retro-shadow: 4px 4px 0px #120b29;
-  --retro-shadow-sm: 2px 2px 0px #120b29;
-  --retro-shadow-cream: 3px 3px 0px #ab9870;
+  /* Vintage Poster Elevation & Inset Effects */
+  --poster-shadow: 4px 4px 0px #24152c;
+  --poster-shadow-lg: 6px 6px 0px #24152c;
+  --poster-shadow-gold: 4px 4px 0px #f4a928;
+  --poster-card-inset: inset 0 0 0 2px #24152c;
 
   /* Typography Stacks */
-  --font-display: "Courier New", Courier, monospace, system-ui;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: "Bungee", "Bowlby One SC", "Impact", "Arial Black", sans-serif;
+  --font-serif: "Georgia", "Palatino", serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+  --font-body: "DM Sans", "Segoe UI", Roboto, -apple-system, sans-serif;
 }

@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { healthApi, profileApi, CreatorProfile, WeeklyTopicSchedule } from '../services/api';
 import { DependenciesHealth, LiveHealth, ReadyHealth, RootInfo } from '../types/api';
 import { AppShell } from '../components/layout/AppShell';
-import { RetroWindow } from '../components/retro/RetroWindow';
-import { PixelButton } from '../components/retro/PixelButton';
-import { StatusBadge } from '../components/retro/StatusBadge';
+import { PosterFrame } from '../components/poster/PosterFrame';
+import { PosterButton } from '../components/poster/PosterButton';
+import { PosterBadge } from '../components/poster/PosterBadge';
+import { PosterHero } from '../components/illustrations/PosterHero';
+import { OrnateDivider } from '../components/illustrations/OrnateMotifs';
+import { ProfileView } from '../components/dashboard/ProfileView';
+import { ScheduleView } from '../components/dashboard/ScheduleView';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -32,7 +36,7 @@ export const Dashboard: React.FC = () => {
       setReadyHealth(ready);
       setDependencies(deps);
 
-      // Attempt loading real persisted profile & schedule if ready
+      // Load profile and schedule if database is available
       if (ready.checks.database === 'connected') {
         try {
           const [prof, scheds] = await Promise.all([
@@ -42,11 +46,11 @@ export const Dashboard: React.FC = () => {
           setProfile(prof);
           setSchedules(scheds);
         } catch {
-          // Keep profile null if DB has temporary issue
+          // If profile table not initialized yet, retain safe fallback
         }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Backend connection failed.');
+    } catch {
+      setError('Studio workspace connection is currently unavailable. Ensure the backend server is running and retry.');
     } finally {
       setLoading(false);
     }
@@ -56,192 +60,269 @@ export const Dashboard: React.FC = () => {
     loadData();
   }, []);
 
+  const handleProfileUpdate = async (updatedData: Partial<CreatorProfile>) => {
+    const res = await profileApi.updateProfile(updatedData);
+    setProfile(res);
+  };
+
+  const handleScheduleUpsert = async (entry: { day_of_week: string; topic: string; subtopic?: string; content_focus?: string }) => {
+    await profileApi.upsertSchedule(entry);
+    const updated = await profileApi.listSchedules();
+    setSchedules(updated);
+  };
+
+  const handleScheduleDelete = async (id: string) => {
+    await profileApi.deleteSchedule(id);
+    const updated = await profileApi.listSchedules();
+    setSchedules(updated);
+  };
+
   return (
     <AppShell activeTab={activeTab} onTabChange={setActiveTab}>
       {/* Loading Banner */}
       {loading && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <RetroWindow title="SYSTEM BOOT SEQUENCE" variant="cream">
-            <p style={{ margin: 0, fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-              ⚡ Reading system registers and querying backend health endpoints...
-            </p>
-          </RetroWindow>
+        <div style={{ marginBottom: '2rem' }}>
+          <PosterFrame title="INITIALIZING CREATOR WORKSPACE" variant="cream">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
+              <span style={{ fontSize: '1.5rem', color: 'var(--vermilion)' }}>✦</span>
+              <p style={{ margin: 0, fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: '1.1rem' }}>
+                Connecting to studio gateway and reading channel registers...
+              </p>
+            </div>
+          </PosterFrame>
         </div>
       )}
 
-      {/* Connection Failure Error State */}
+      {/* Clean User-Facing Connection Error State */}
       {error && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <RetroWindow
-            title="CRITICAL ALERT // CONNECTION ERROR"
-            variant="purple"
-            badge="OFFLINE"
+        <div style={{ marginBottom: '2rem' }}>
+          <PosterFrame
+            title="STUDIO CONNECTION NOTICE"
+            variant="vermilion"
             action={
-              <PixelButton variant="orange" size="sm" onClick={loadData}>
-                RETRY HANDSHAKE
-              </PixelButton>
+              <PosterButton variant="saffron" size="sm" onClick={loadData}>
+                RECONNECT
+              </PosterButton>
             }
           >
-            <p style={{ margin: '0 0 1rem 0', color: 'var(--status-error)' }}>
-              Could not establish connection with FastAPI backend server at {import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}:
-            </p>
-            <div
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                padding: '0.75rem',
-                borderRadius: '4px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.85rem',
-                color: '#fff',
-                marginBottom: '1rem',
-              }}
-            >
-              {error}
+            <div style={{ padding: '0.5rem 0' }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#FFFFFF', fontSize: '1.25rem' }}>
+                Studio Connection Unavailable
+              </h3>
+              <p style={{ margin: '0 0 1rem 0', color: 'var(--warm-cream)', fontSize: '1rem' }}>
+                Your workspace could not establish a connection to the backend service. Check that the service is running, then select Reconnect.
+              </p>
             </div>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              Ensure backend server is running via: <code>uvicorn app.main:app --reload</code>
-            </p>
-          </RetroWindow>
+          </PosterFrame>
         </div>
       )}
 
       {!loading && !error && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* Top Hero / Welcome Banner */}
-          <RetroWindow
-            title="WORKSPACE TERMINAL // ACTIVE SESSION"
-            variant="cream"
-            action={
-              <PixelButton variant="teal" size="sm" onClick={loadData}>
-                REFRESH STATUS
-              </PixelButton>
-            }
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-              <div>
-                <h2 style={{ margin: '0 0 0.4rem 0', fontSize: '1.4rem', color: 'var(--text-dark)', fontWeight: 800 }}>
-                  COMMAND CENTER: {profile ? profile.display_name.toUpperCase() : 'SOLO CREATOR'}
-                </h2>
-                <p style={{ margin: 0, color: 'var(--text-dark-muted)', fontSize: '0.95rem' }}>
-                  Niche: <strong>{profile ? profile.primary_niche : 'Configurable in Creator Profile'}</strong> // Timezone: <strong>{profile ? profile.timezone : 'Asia/Kolkata'}</strong>
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <StatusBadge
-                  status={liveHealth?.status === 'live' ? 'success' : 'error'}
-                  label={`API: ${liveHealth?.status || 'UNKNOWN'}`}
-                />
-                <StatusBadge
-                  status={readyHealth?.checks.database === 'connected' ? 'success' : 'warning'}
-                  label={`DB: ${readyHealth?.checks.database || 'NOT_READY'}`}
-                />
-                <StatusBadge
-                  status={dependencies?.openrouter.configured ? 'info' : 'neutral'}
-                  label={`LLM: ${dependencies?.openrouter.configured ? 'FREE GATEWAY' : 'UNCONFIGURED'}`}
-                />
-              </div>
-            </div>
-          </RetroWindow>
+        <div>
+          {/* TAB 1: DASHBOARD COMMAND CENTER */}
+          {activeTab === 'dashboard' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {/* Grand Illustrated Hero Poster Banner */}
+              <PosterHero
+                channelName={profile ? profile.display_name : 'CREATOR STUDIO'}
+                niche={profile ? profile.primary_niche : 'TECH & CULTURE'}
+                onActionClick={() => setActiveTab('schedule')}
+              />
 
-          {/* Grid Layout: System Health & Production Overview */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-            {/* System Diagnostic Window */}
-            <RetroWindow title="HARDWARE & GATEWAY REGISTERS" variant="purple">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>APPLICATION PROCESS:</span>
-                  <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{rootInfo?.name} (v{rootInfo?.version})</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>SUPABASE POSTGRESQL:</span>
-                  <span style={{ color: readyHealth?.checks.database === 'connected' ? 'var(--status-success)' : 'var(--status-warning)', fontWeight: 700 }}>
-                    {dependencies?.database.status.toUpperCase()}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>OPENROUTER GATEWAY:</span>
-                  <span style={{ color: dependencies?.openrouter.configured ? 'var(--accent-teal)' : 'var(--text-muted)' }}>
-                    {dependencies?.openrouter.configured ? 'CONFIGURED (:free)' : 'AWAITING KEY'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>YOUTUBE DATA API v3:</span>
-                  <span style={{ color: dependencies?.youtube.configured ? 'var(--accent-teal)' : 'var(--text-muted)' }}>
-                    {dependencies?.youtube.configured ? 'CLIENT ID READY' : 'AWAITING OAUTH'}
-                  </span>
-                </div>
-              </div>
-            </RetroWindow>
-
-            {/* Daily Workflow Overview Window */}
-            <RetroWindow title="AUTOMATION PIPELINE OVERVIEW" variant="purple" badge="PIPELINE SPEC">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>⏰</span>
-                  <div style={{ fontSize: '0.85rem' }}>
-                    <div style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>07:00 Morning Scheduler</div>
-                    <div style={{ color: 'var(--text-secondary)' }}>Queries active weekday topic &amp; gathers research bundle.</div>
+              {/* Status & Gateway Summary Card */}
+              <PosterFrame
+                title="STUDIO DISPATCH // OPERATIONAL STATUS"
+                variant="cream"
+                action={
+                  <PosterButton variant="vermilion" size="sm" onClick={loadData}>
+                    REFRESH REGISTERS
+                  </PosterButton>
+                }
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <h2 style={{ margin: '0 0 0.3rem 0', fontSize: '1.3rem', color: 'var(--dark-outline)' }}>
+                      CHANNEL DISPATCH: {profile ? profile.display_name.toUpperCase() : 'SOLO CREATOR'}
+                    </h2>
+                    <p style={{ margin: 0, color: 'var(--text-on-cream-muted)', fontSize: '0.95rem' }}>
+                      Niche: <strong>{profile ? profile.primary_niche : 'Configure in Creator Profile'}</strong> // Timezone: <strong>{profile ? profile.timezone : 'Asia/Kolkata'}</strong>
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <PosterBadge
+                      status={liveHealth?.status === 'live' ? 'active' : 'alert'}
+                      label={`API: ${liveHealth?.status === 'live' ? 'ONLINE' : 'OFFLINE'}`}
+                    />
+                    <PosterBadge
+                      status={readyHealth?.checks.database === 'connected' ? 'active' : 'warning'}
+                      label={`DB: ${readyHealth?.checks.database === 'connected' ? 'CONNECTED' : 'DISCONNECTED'}`}
+                    />
+                    <PosterBadge
+                      status={dependencies?.openrouter.configured ? 'info' : 'warning'}
+                      label={`LLM: ${dependencies?.openrouter.configured ? 'ACTIVE (:free)' : 'UNCONFIGURED'}`}
+                    />
                   </div>
                 </div>
+              </PosterFrame>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>⚡</span>
-                  <div style={{ fontSize: '0.85rem' }}>
-                    <div style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>Single-Call LLM Generation</div>
-                    <div style={{ color: 'var(--text-secondary)' }}>Builds long-form script, Shorts script, titles, tags, narration.</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '4px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>🎬</span>
-                  <div style={{ fontSize: '0.85rem' }}>
-                    <div style={{ fontWeight: 700, color: 'var(--accent-orange)' }}>External Video Creation</div>
-                    <div style={{ color: 'var(--text-secondary)' }}>User manually creates video; zero paid video APIs utilized.</div>
-                  </div>
-                </div>
-              </div>
-            </RetroWindow>
-          </div>
-
-          {/* Weekly Topics Schedule Section */}
-          <RetroWindow title="WEEKLY TOPIC SCHEDULE // ACTIVE MATRIX" variant="cream" badge="RECURRING">
-            {schedules.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                <p style={{ margin: '0 0 0.5rem 0', fontWeight: 700, color: 'var(--text-dark)' }}>
-                  No scheduled topics configured for this creator profile yet.
-                </p>
-                <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: 'var(--text-dark-muted)' }}>
-                  Phase 1 persistent database model and API routes are ready. Topic entries can be posted to <code>/api/v1/profile/schedules</code>.
-                </p>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                {schedules.map((s) => (
-                  <div
-                    key={s.id}
-                    style={{
-                      backgroundColor: 'var(--card-cream-light)',
-                      border: '1px solid var(--border-cream)',
-                      borderRadius: '4px',
-                      padding: '0.75rem',
-                    }}
-                  >
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-orange)', textTransform: 'uppercase' }}>
-                      {s.day_of_week}
-                    </div>
-                    <div style={{ fontWeight: 700, color: 'var(--text-dark)', marginTop: '0.25rem' }}>
-                      {s.topic}
-                    </div>
-                    {s.subtopic && (
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-dark-muted)', marginTop: '0.2rem' }}>
-                        {s.subtopic}
+              {/* Grid: Daily Production Journey & Gateway Connections */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
+                {/* Visual Workflow Journey Timeline */}
+                <PosterFrame title="DAILY PRODUCTION TIMELINE" variant="indigo">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px', border: '1px solid rgba(244,169,40,0.3)' }}>
+                      <span style={{ fontSize: '1.4rem', color: 'var(--saffron-gold)' }}>★</span>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--saffron-gold)' }}>
+                          07:00 MORNING WORKFLOW
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--antique-paper)' }}>
+                          Retrieves active weekday topic &amp; gathers research citations.
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px', border: '1px solid rgba(244,169,40,0.3)' }}>
+                      <span style={{ fontSize: '1.4rem', color: 'var(--festival-teal)' }}>✦</span>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--festival-teal)' }}>
+                          ONE-CALL LLM GENERATION
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--antique-paper)' }}>
+                          Builds complete long-form script, Shorts script, titles &amp; tags in 1 prompt.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px', border: '1px solid rgba(244,169,40,0.3)' }}>
+                      <span style={{ fontSize: '1.4rem', color: 'var(--vermilion)' }}>🎬</span>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--vermilion)' }}>
+                          HUMAN CREATOR CRAFTING
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--antique-paper)' }}>
+                          User creates video in preferred tool; \$0 video API budget.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '6px', border: '1px solid rgba(244,169,40,0.3)' }}>
+                      <span style={{ fontSize: '1.4rem', color: 'var(--saffron-bright)' }}>🚀</span>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.9rem', color: 'var(--saffron-bright)' }}>
+                          SCHEDULED PUBLICATION
+                        </div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--antique-paper)' }}>
+                          Scheduled deployment via YouTube Data API v3 with metadata.
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                ))}
+                </PosterFrame>
+
+                {/* Gateway Integration Registers */}
+                <PosterFrame title="INTEGRATION GATEWAYS" variant="turquoise">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid rgba(0,0,0,0.15)', paddingBottom: '0.5rem' }}>
+                      <span style={{ fontWeight: 700 }}>DATABASE CLUSTER:</span>
+                      <span style={{ fontWeight: 800 }}>
+                        {readyHealth?.checks.database === 'connected' ? 'POSTGRES CONNECTED' : 'UNCONFIGURED'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid rgba(0,0,0,0.15)', paddingBottom: '0.5rem' }}>
+                      <span style={{ fontWeight: 700 }}>OPENROUTER GATEWAY:</span>
+                      <span style={{ fontWeight: 800 }}>
+                        {dependencies?.openrouter.configured ? 'FREE TIER ACTIVE' : 'KEY REQUIRED'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid rgba(0,0,0,0.15)', paddingBottom: '0.5rem' }}>
+                      <span style={{ fontWeight: 700 }}>YOUTUBE DATA API:</span>
+                      <span style={{ fontWeight: 800 }}>
+                        {dependencies?.youtube.configured ? 'CLIENT ID REGISTERED' : 'OAUTH REQUIRED'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 700 }}>SYSTEM STATUS:</span>
+                      <span style={{ fontWeight: 800 }}>
+                        {rootInfo?.status === 'running' ? 'OPERATIONAL' : 'OFFLINE'}
+                      </span>
+                    </div>
+                  </div>
+                </PosterFrame>
               </div>
-            )}
-          </RetroWindow>
+
+              <OrnateDivider />
+
+              {/* Weekly Topic Planner Preview */}
+              <PosterFrame
+                title="WEEKLY TOPIC SCHEDULE // EDITORIAL ROSTER"
+                variant="cream"
+                action={
+                  <PosterButton variant="saffron" size="sm" onClick={() => setActiveTab('schedule')}>
+                    MANAGE ROSTER
+                  </PosterButton>
+                }
+              >
+                {schedules.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', fontWeight: 800, fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--text-on-cream)' }}>
+                      NO PRODUCTION TOPICS CONFIGURED YET
+                    </p>
+                    <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.95rem', color: 'var(--text-on-cream-muted)', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto' }}>
+                      Assign topics for each day of the week to enable automated morning workflow packages and structured script synthesis.
+                    </p>
+                    <PosterButton variant="vermilion" size="md" onClick={() => setActiveTab('schedule')}>
+                      CONFIGURE WEEKDAY TOPICS
+                    </PosterButton>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                    {schedules.map((s) => (
+                      <div
+                        key={s.id}
+                        style={{
+                          backgroundColor: 'var(--antique-paper)',
+                          border: '2px solid var(--dark-outline)',
+                          borderRadius: '6px',
+                          padding: '1rem',
+                          boxShadow: '2px 2px 0px var(--dark-outline)',
+                        }}
+                      >
+                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', fontWeight: 800, color: 'var(--vermilion)', textTransform: 'uppercase' }}>
+                          ✦ {s.day_of_week}
+                        </div>
+                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-on-cream)', marginTop: '0.4rem', lineHeight: 1.3 }}>
+                          {s.topic}
+                        </div>
+                        {s.subtopic && (
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-on-cream-muted)', marginTop: '0.3rem' }}>
+                            {s.subtopic}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PosterFrame>
+            </div>
+          )}
+
+          {/* TAB 2: CREATOR PROFILE */}
+          {activeTab === 'profile' && (
+            <ProfileView profile={profile} onUpdate={handleProfileUpdate} />
+          )}
+
+          {/* TAB 3: TOPIC SCHEDULE */}
+          {activeTab === 'schedule' && (
+            <ScheduleView
+              schedules={schedules}
+              onUpsert={handleScheduleUpsert}
+              onDelete={handleScheduleDelete}
+            />
+          )}
         </div>
       )}
     </AppShell>

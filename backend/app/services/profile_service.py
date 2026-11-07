@@ -25,8 +25,12 @@ class ProfileService:
         self.profile_repo = ProfileRepository(db)
         self.schedule_repo = TopicScheduleRepository(db)
 
+    def get_profile(self) -> Optional[CreatorProfile]:
+        """Fetch existing creator profile without silently creating one on read."""
+        return self.profile_repo.get_first_profile()
+
     def get_or_create_default_profile(self) -> CreatorProfile:
-        """Fetch existing profile or initialize a sensible default profile."""
+        """Fetch existing profile or initialize a sensible default profile if missing."""
         profile = self.profile_repo.get_first_profile()
         if profile is None:
             default_data = CreatorProfileCreate(
@@ -44,6 +48,7 @@ class ProfileService:
         return profile
 
     def update_profile(self, data: CreatorProfileUpdate) -> CreatorProfile:
+        """Update creator profile. Initializes default if none exists yet."""
         profile = self.get_or_create_default_profile()
         updated = self.profile_repo.update(profile, data)
         self.db.commit()
@@ -51,12 +56,16 @@ class ProfileService:
         return updated
 
     def list_topic_schedules(self) -> List[WeeklyTopicSchedule]:
-        profile = self.get_or_create_default_profile()
+        """List schedule entries for the current profile; empty list if no profile exists."""
+        profile = self.profile_repo.get_first_profile()
+        if profile is None:
+            return []
         return self.schedule_repo.list_by_profile(profile.id)
 
     def upsert_topic_schedule(
         self, data: WeeklyTopicScheduleCreate
     ) -> WeeklyTopicSchedule:
+        """Create or update a topic schedule for a specific weekday."""
         profile = self.get_or_create_default_profile()
         existing = self.schedule_repo.get_by_day(profile.id, data.day_of_week)
         if existing:

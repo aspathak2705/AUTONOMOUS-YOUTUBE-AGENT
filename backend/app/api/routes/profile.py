@@ -1,7 +1,7 @@
 """Creator Profile and Weekly Topic Schedule API Routes."""
 
 import uuid
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -22,12 +22,12 @@ def get_profile_service(db: Session = Depends(get_db)) -> ProfileService:
     return ProfileService(db)
 
 
-@router.get("", response_model=CreatorProfileResponse, summary="Get Creator Profile")
+@router.get("", response_model=Optional[CreatorProfileResponse], summary="Get Creator Profile")
 def get_creator_profile(
     service: ProfileService = Depends(get_profile_service),
-) -> CreatorProfileResponse:
-    """Retrieve creator profile. Creates default profile if not present."""
-    return service.get_or_create_default_profile()
+) -> Optional[CreatorProfileResponse]:
+    """Retrieve creator profile without auto-generating records on read."""
+    return service.get_profile()
 
 
 @router.patch("", response_model=CreatorProfileResponse, summary="Update Creator Profile")
