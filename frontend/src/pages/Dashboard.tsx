@@ -6,9 +6,12 @@ import { PosterFrame } from '../components/poster/PosterFrame';
 import { PosterButton } from '../components/poster/PosterButton';
 import { PosterBadge } from '../components/poster/PosterBadge';
 import { PosterHero } from '../components/illustrations/PosterHero';
-import { OrnateDivider } from '../components/illustrations/OrnateMotifs';
+import { PosterRibbonDivider } from '../components/poster/PosterBanner';
+import { MedallionCard } from '../components/poster/MedallionCard';
+import { PosterAssetImage } from '../components/poster/PosterAssetImage';
 import { ProfileView } from '../components/dashboard/ProfileView';
 import { ScheduleView } from '../components/dashboard/ScheduleView';
+import { illustrations, medallions, ornaments } from '../assets';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -84,7 +87,9 @@ export const Dashboard: React.FC = () => {
         <div style={{ marginBottom: '2rem' }}>
           <PosterFrame title="INITIALIZING CREATOR WORKSPACE" variant="cream">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
-              <span style={{ fontSize: '1.5rem', color: 'var(--vermilion)' }}>✦</span>
+              <div style={{ width: 36, height: 36 }}>
+                <PosterAssetImage asset={ornaments.badgeDiya} width={36} height={36} />
+              </div>
               <p style={{ margin: 0, fontWeight: 700, fontFamily: 'var(--font-display)', fontSize: '1.1rem' }}>
                 Connecting to studio gateway and reading channel registers...
               </p>
@@ -126,7 +131,8 @@ export const Dashboard: React.FC = () => {
               <PosterHero
                 channelName={profile ? profile.display_name : 'CREATOR STUDIO'}
                 niche={profile ? profile.primary_niche : 'TECH & CULTURE'}
-                onActionClick={() => setActiveTab('schedule')}
+                onActionClick={() => setActiveTab('packages')}
+                onPlannerClick={() => setActiveTab('schedule')}
               />
 
               {/* Status & Gateway Summary Card */}
@@ -140,13 +146,18 @@ export const Dashboard: React.FC = () => {
                 }
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                  <div>
-                    <h2 style={{ margin: '0 0 0.3rem 0', fontSize: '1.3rem', color: 'var(--dark-outline)' }}>
-                      CHANNEL DISPATCH: {profile ? profile.display_name.toUpperCase() : 'SOLO CREATOR'}
-                    </h2>
-                    <p style={{ margin: 0, color: 'var(--text-on-cream-muted)', fontSize: '0.95rem' }}>
-                      Niche: <strong>{profile ? profile.primary_niche : 'Configure in Creator Profile'}</strong> // Timezone: <strong>{profile ? profile.timezone : 'Asia/Kolkata'}</strong>
-                    </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: 44, height: 44, flexShrink: 0 }}>
+                      <PosterAssetImage asset={ornaments.badgeLotus} width={44} height={44} />
+                    </div>
+                    <div>
+                      <h2 style={{ margin: '0 0 0.3rem 0', fontSize: '1.3rem', color: 'var(--dark-outline)' }}>
+                        CHANNEL DISPATCH: {profile ? profile.display_name.toUpperCase() : 'SOLO CREATOR'}
+                      </h2>
+                      <p style={{ margin: 0, color: 'var(--text-on-cream-muted)', fontSize: '0.95rem' }}>
+                        Niche: <strong>{profile ? profile.primary_niche : 'Configure in Creator Profile'}</strong> // Timezone: <strong>{profile ? profile.timezone : 'Asia/Kolkata'}</strong>
+                      </p>
+                    </div>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <PosterBadge
@@ -164,6 +175,87 @@ export const Dashboard: React.FC = () => {
                   </div>
                 </div>
               </PosterFrame>
+
+              {/* Six Pillar Medallion Cards Grid */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <span style={{ color: 'var(--saffron-gold)', fontSize: '1.25rem' }}>★</span>
+                  <h2
+                    style={{
+                      margin: 0,
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '1.2rem',
+                      color: 'var(--saffron-gold)',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    CREATOR STUDIO MODULES
+                  </h2>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '1.25rem',
+                  }}
+                >
+                  <MedallionCard
+                    asset={medallions.goldSun}
+                    title="STUDIO HOME"
+                    badge="Active"
+                    description="Central dispatch overview, real-time gateway registers, and automated morning workflow dispatch."
+                    actionText="View Status"
+                    onAction={() => setActiveTab('dashboard')}
+                    accentColor="var(--saffron-gold)"
+                  />
+                  <MedallionCard
+                    asset={medallions.tealLotus}
+                    title="CREATOR PROFILE"
+                    badge="Configured"
+                    description="Configure target audience, language, primary niche, and channel identity settings."
+                    actionText="Edit Profile"
+                    onAction={() => setActiveTab('profile')}
+                    accentColor="var(--festival-teal)"
+                  />
+                  <MedallionCard
+                    asset={medallions.rubyShield}
+                    title="TOPIC SCHEDULE"
+                    badge="Weekly"
+                    description="7-day automated topic roster driving daily research synthesis and content creation."
+                    actionText="Edit Schedule"
+                    onAction={() => setActiveTab('schedule')}
+                    accentColor="var(--vermilion)"
+                  />
+                  <MedallionCard
+                    asset={medallions.saffronMandala}
+                    title="CONTENT WORKSPACE"
+                    badge="Upcoming"
+                    description="One-prompt complete script generation: long-form script, Shorts script, titles, descriptions & tags."
+                    actionText="Phase 2 Module"
+                    planned={true}
+                    accentColor="var(--saffron-gold)"
+                  />
+                  <MedallionCard
+                    asset={medallions.peacockWheel}
+                    title="MEDIA CRAFTING"
+                    badge="Upcoming"
+                    description="Manual creator video validation, zero-cost external tool workflow, and audio-visual check."
+                    actionText="Phase 3 Module"
+                    planned={true}
+                    accentColor="var(--festival-teal)"
+                  />
+                  <MedallionCard
+                    asset={medallions.emeraldStar}
+                    title="YOUTUBE PUBLISHING"
+                    badge="Upcoming"
+                    description="Automated OAuth deployment to YouTube Data API v3, thumbnail staging, and scheduled release."
+                    actionText="Phase 4 Module"
+                    planned={true}
+                    accentColor="var(--saffron-bright)"
+                  />
+                </div>
+              </div>
 
               {/* Grid: Daily Production Journey & Gateway Connections */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
@@ -201,7 +293,7 @@ export const Dashboard: React.FC = () => {
                           HUMAN CREATOR CRAFTING
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--antique-paper)' }}>
-                          User creates video in preferred tool; \$0 video API budget.
+                          User creates video in preferred tool; $0 video API budget.
                         </div>
                       </div>
                     </div>
@@ -254,7 +346,7 @@ export const Dashboard: React.FC = () => {
                 </PosterFrame>
               </div>
 
-              <OrnateDivider />
+              <PosterRibbonDivider />
 
               {/* Weekly Topic Planner Preview */}
               <PosterFrame
@@ -298,8 +390,15 @@ export const Dashboard: React.FC = () => {
                           {s.topic}
                         </div>
                         {s.subtopic && (
-                          <div style={{ fontSize: '0.85rem', color: 'var(--text-on-cream-muted)', marginTop: '0.3rem' }}>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--text-on-cream-muted)', marginTop: '0.25rem' }}>
                             {s.subtopic}
+                          </div>
+                        )}
+                        {s.content_focus && (
+                          <div style={{ marginTop: '0.6rem' }}>
+                            <span style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', fontWeight: 700, backgroundColor: 'rgba(7,141,173,0.15)', color: 'var(--rich-turquoise)', padding: '2px 6px', borderRadius: '3px' }}>
+                              {s.content_focus}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -322,6 +421,122 @@ export const Dashboard: React.FC = () => {
               onUpsert={handleScheduleUpsert}
               onDelete={handleScheduleDelete}
             />
+          )}
+
+          {/* TAB 4: CONTENT WORKSPACE (EMPTY STATE WITH MEDIA GARDEN ILLUSTRATION) */}
+          {activeTab === 'packages' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <PosterFrame title="CONTENT WORKSPACE // SCRIPT SYNTHESIS" variant="indigo">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: '2rem',
+                    padding: '1rem 0',
+                  }}
+                >
+                  <div style={{ flex: '1 1 360px' }}>
+                    <div
+                      style={{
+                        borderRadius: '8px',
+                        border: '3px solid var(--saffron-gold)',
+                        overflow: 'hidden',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                      }}
+                    >
+                      <PosterAssetImage asset={illustrations.mediaGarden} />
+                    </div>
+                  </div>
+                  <div style={{ flex: '1 1 360px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                      <span style={{ color: 'var(--saffron-gold)' }}>★</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--saffron-gold)', fontWeight: 700 }}>
+                        UPCOMING PHASE 2 PIPELINE
+                      </span>
+                    </div>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', color: 'var(--text-on-dark)', margin: '0 0 1rem 0' }}>
+                      ONE-CALL LLM GENERATION
+                    </h2>
+                    <p style={{ color: 'var(--antique-paper)', lineHeight: 1.6, fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>
+                      Once scheduled topics are active, the automated morning workflow retrieves research citations and dispatches a single structured prompt to OpenRouter (:free tier). It generates full long-form narration, Shorts script, thumbnail concepts, and publishing metadata.
+                    </p>
+                    <PosterButton variant="saffron" size="md" onClick={() => setActiveTab('schedule')}>
+                      CONFIGURE TOPIC SCHEDULE ➔
+                    </PosterButton>
+                  </div>
+                </div>
+              </PosterFrame>
+            </div>
+          )}
+
+          {/* TAB 5: MEDIA UPLOAD (EMPTY STATE WITH MEDIA GARDEN ILLUSTRATION) */}
+          {activeTab === 'media' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <PosterFrame title="MEDIA UPLOAD // WORKSTATION CHECK" variant="cream">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: '2rem',
+                    padding: '1rem 0',
+                  }}
+                >
+                  <div style={{ flex: '1 1 360px' }}>
+                    <div
+                      style={{
+                        borderRadius: '8px',
+                        border: '3px solid var(--dark-outline)',
+                        overflow: 'hidden',
+                        boxShadow: '4px 4px 0px var(--dark-outline)',
+                      }}
+                    >
+                      <PosterAssetImage asset={illustrations.workstation} />
+                    </div>
+                  </div>
+                  <div style={{ flex: '1 1 360px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                      <span style={{ color: 'var(--vermilion)' }}>★</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--vermilion)', fontWeight: 700 }}>
+                        EXTERNAL CRAFTING // ZERO API COST
+                      </span>
+                    </div>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', color: 'var(--dark-outline)', margin: '0 0 1rem 0' }}>
+                      HUMAN-PRODUCED MEDIA VALIDATION
+                    </h2>
+                    <p style={{ color: 'var(--text-on-cream-muted)', lineHeight: 1.6, fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>
+                      To maintain our zero-paid-API mandate, video rendering is crafted externally by you using your preferred editor. In Phase 3, this workstation validates video dimensions, duration, bitrate, audio tracks, and caption alignment before deployment.
+                    </p>
+                    <PosterButton variant="vermilion" size="md" onClick={() => setActiveTab('dashboard')}>
+                      RETURN TO DISPATCH
+                    </PosterButton>
+                  </div>
+                </div>
+              </PosterFrame>
+            </div>
+          )}
+
+          {/* TAB 6: PUBLISHING (EMPTY STATE) */}
+          {activeTab === 'youtube' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <PosterFrame title="YOUTUBE PUBLISHING // DEPLOYMENT CALENDAR" variant="turquoise">
+                <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                  <div style={{ width: 64, height: 64, margin: '0 auto 1rem auto' }}>
+                    <PosterAssetImage asset={medallions.emeraldStar} width={64} height={64} />
+                  </div>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#FFF', margin: '0 0 0.75rem 0' }}>
+                    YOUTUBE DATA API V3 AUTOMATION
+                  </h2>
+                  <p style={{ color: 'var(--warm-cream)', maxWidth: '580px', margin: '0 auto 1.5rem auto', lineHeight: 1.6 }}>
+                    Direct OAuth integration with YouTube Studio for automated uploads, thumbnail staging, description tagging, and scheduled release times according to your editorial calendar.
+                  </p>
+                  <PosterButton variant="saffron" size="md" onClick={() => setActiveTab('dashboard')}>
+                    RETURN TO STUDIO HOME
+                  </PosterButton>
+                </div>
+              </PosterFrame>
+            </div>
           )}
         </div>
       )}

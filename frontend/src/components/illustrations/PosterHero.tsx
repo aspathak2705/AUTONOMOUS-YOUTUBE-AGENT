@@ -1,17 +1,20 @@
 import React from 'react';
-import { OrnatePlayMedallion } from '../illustrations/OrnateMotifs';
+import { illustrations, ornaments } from '../../assets';
+import { PosterAssetImage } from '../poster/PosterAssetImage';
 import { PosterButton } from '../poster/PosterButton';
 
 export interface PosterHeroProps {
   channelName?: string;
   niche?: string;
   onActionClick?: () => void;
+  onPlannerClick?: () => void;
 }
 
 export const PosterHero: React.FC<PosterHeroProps> = ({
   channelName = 'CREATOR STUDIO',
   niche = 'TECH & STORIES',
   onActionClick,
+  onPlannerClick,
 }) => {
   return (
     <div
@@ -19,7 +22,7 @@ export const PosterHero: React.FC<PosterHeroProps> = ({
         position: 'relative',
         backgroundColor: 'var(--ink-navy)',
         border: '4px solid var(--saffron-gold)',
-        borderRadius: '10px',
+        borderRadius: '12px',
         padding: '2.5rem 2rem',
         boxShadow: 'var(--poster-shadow-gold)',
         overflow: 'hidden',
@@ -27,18 +30,47 @@ export const PosterHero: React.FC<PosterHeroProps> = ({
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '2rem',
+        gap: '2.5rem',
         backgroundImage:
-          'radial-gradient(circle at 80% 30%, rgba(213, 42, 128, 0.25) 0%, transparent 60%), radial-gradient(circle at 10% 70%, rgba(7, 141, 173, 0.2) 0%, transparent 50%)',
+          'radial-gradient(circle at 85% 30%, rgba(213, 42, 128, 0.22) 0%, transparent 60%), radial-gradient(circle at 15% 75%, rgba(7, 141, 173, 0.2) 0%, transparent 50%)',
       }}
     >
-      {/* Decorative Outer Border Lines */}
+      {/* Decorative Ornate Corners from extracted assets */}
       <div
         style={{
           position: 'absolute',
-          inset: 6,
-          border: '1px dashed rgba(244, 169, 40, 0.4)',
-          borderRadius: '6px',
+          top: 6,
+          left: 6,
+          width: 72,
+          height: 56,
+          pointerEvents: 'none',
+          opacity: 0.85,
+        }}
+      >
+        <PosterAssetImage asset={ornaments.cornerTl} width={72} />
+      </div>
+
+      <div
+        style={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          width: 72,
+          height: 56,
+          pointerEvents: 'none',
+          opacity: 0.85,
+        }}
+      >
+        <PosterAssetImage asset={ornaments.cornerTr} width={72} />
+      </div>
+
+      {/* Decorative Inner Border Lines */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 8,
+          border: '1px dashed rgba(244, 169, 40, 0.45)',
+          borderRadius: '8px',
           pointerEvents: 'none',
         }}
       />
@@ -93,39 +125,63 @@ export const PosterHero: React.FC<PosterHeroProps> = ({
             <span>CREATE CONTENT PACKAGE</span>
             <span>➔</span>
           </PosterButton>
-          <PosterButton variant="turquoise" size="lg" onClick={onActionClick}>
+          <PosterButton variant="turquoise" size="lg" onClick={onPlannerClick || onActionClick}>
             <span>OPEN PLANNER</span>
           </PosterButton>
         </div>
       </div>
 
-      {/* Right Column: Ornate Play Medallion & Crest */}
+      {/* Right Column: Workstation Illustration Frame */}
       <div
         style={{
-          flex: '0 0 auto',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flex: '0 1 420px',
           position: 'relative',
           zIndex: 2,
-          padding: '1rem',
           margin: '0 auto',
+          maxWidth: '100%',
         }}
       >
-        <OrnatePlayMedallion size={130} />
         <div
           style={{
-            marginTop: '0.75rem',
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.85rem',
-            color: 'var(--saffron-gold)',
-            letterSpacing: '0.08em',
-            textAlign: 'center',
-            textShadow: '1px 1px 0px #000',
+            borderRadius: '10px',
+            border: '3px solid var(--saffron-gold)',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.6)',
+            overflow: 'hidden',
+            backgroundColor: '#0c071a',
+            position: 'relative',
           }}
+          className="hero-workstation-container"
         >
-          THE CREATOR EDITION
+          <PosterAssetImage
+            asset={illustrations.workstation}
+            width={420}
+            height={280}
+            loading="eager"
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          />
+
+          {/* Subtitle tag */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: 'rgba(17, 26, 50, 0.92)',
+              borderTop: '2px solid var(--saffron-gold)',
+              padding: '0.4rem 0.75rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.7rem',
+              color: 'var(--saffron-gold)',
+              letterSpacing: '0.08em',
+            }}
+          >
+            <span>AUTONOMOUS PRODUCTION SUITE</span>
+            <span>★ ZERO-PAID-API</span>
+          </div>
         </div>
       </div>
     </div>
